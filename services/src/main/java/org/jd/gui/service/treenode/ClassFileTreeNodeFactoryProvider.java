@@ -14,8 +14,8 @@ import org.jd.gui.api.feature.ContainerEntryGettable;
 import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.util.ImageUtil;
+import org.jd.gui.view.data.TreeNodeBean;
 import org.jd.gui.view.component.DynamicPage;
-import org.jd.gui.view.data.ClassFileTreeNodeBean;
 
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -35,10 +35,8 @@ import jd.core.CoreConstants;
 
 public class ClassFileTreeNodeFactoryProvider extends AbstractTypeFileTreeNodeFactoryProvider {
 
-    public static final ImageIcon CLASS_FILE_ICON = new ImageIcon(ImageUtil.getImage("/org/jd/gui/images/classf_obj.png"));
-    public static final ImageIcon CLASS_FILE_ICON_ERROR = new ImageIcon(ImageUtil.getImage("/org/jd/gui/images/classf_obj_error.png"));
-    public static final ImageIcon CLASS_FILE_ICON_WARNING = new ImageIcon(ImageUtil.getImage("/org/jd/gui/images/classf_obj_warning.png"));
-    public static final Factory FACTORY = new Factory();
+    protected static final ImageIcon CLASS_FILE_ICON = new ImageIcon(ImageUtil.getImage("/org/jd/gui/images/classf_obj.png"));
+    protected static final Factory FACTORY = new Factory();
 
     @Override
     public String[] getSelectors() {
@@ -58,10 +56,7 @@ public class ClassFileTreeNodeFactoryProvider extends AbstractTypeFileTreeNodeFa
     public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.getPath().lastIndexOf('/');
         String label = entry.getPath().substring(lastSlashIndex + 1);
-        ClassFileTreeNodeBean treeNodeBean = new ClassFileTreeNodeBean(api, label, entry);
-        FileTreeNode fileTreeNode = new FileTreeNode(entry, treeNodeBean, FACTORY);
-        treeNodeBean.getWorker().execute();
-        return (T) fileTreeNode;
+        return (T) new FileTreeNode(entry, new TreeNodeBean(label, CLASS_FILE_ICON), FACTORY);
     }
 
     protected static class Factory implements AbstractTypeFileTreeNodeFactoryProvider.PageAndTipFactory {
