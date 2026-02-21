@@ -114,6 +114,7 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 
     static class JavaType implements Type {
         private final Container.Entry entry;
+        private final String typeRootPath;
         private int access;
         private String name;
         private String superName;
@@ -129,6 +130,7 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 
         protected JavaType(Container.Entry entry, ClassReader classReader, final int outerAccess) {
             this.entry = entry;
+            this.typeRootPath = inferTypeRootPath(entry.getPath(), classReader.getClassName());
             this.name = "";
             ClassVisitor classAndInnerClassesVisitor = new ClassVisitor(Opcodes.ASM9) {
                 @Override
@@ -271,7 +273,21 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         }
 
         protected Container.Entry getEntry(String typeName) {
-            return entry.getParent().getChildren().get(new FileEntryPath(typeName + StringConstants.CLASS_FILE_SUFFIX));
+            String typePath = typeRootPath + typeName + StringConstants.CLASS_FILE_SUFFIX;
+            Container.Entry found = entry.getParent().getChildren().get(new FileEntryPath(typePath));
+            if (found == null) {
+                // Backward-compatible fallback for containers where class entries are already root-relative.
+                found = entry.getParent().getChildren().get(new FileEntryPath(typeName + StringConstants.CLASS_FILE_SUFFIX));
+            }
+            return found;
+        }
+
+        private static String inferTypeRootPath(String entryPath, String className) {
+            String classFilePath = className + StringConstants.CLASS_FILE_SUFFIX;
+            if (entryPath.endsWith(classFilePath)) {
+                return entryPath.substring(0, entryPath.length() - classFilePath.length());
+            }
+            return "";
         }
 
         @Override
