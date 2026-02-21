@@ -929,10 +929,20 @@ public class MainController implements API {
                             }
                             break;
                         case 2:
-                            compareFiles(files);
+                            int twoFilesSelection = showTwoFilesDropChoiceDialog(info);
+                            if (twoFilesSelection == 0) {
+                                openFiles(files);
+                            } else if (twoFilesSelection == 1) {
+                                compareFiles(files);
+                            }
                             break;
                         default:
-                            launchGAVWorker(info, new HashSet<>(files), new HashMap<>());
+                            int multipleFilesSelection = showThreeOrMoreFilesDropChoiceDialog(info);
+                            if (multipleFilesSelection == 0) {
+                                openFiles(files);
+                            } else if (multipleFilesSelection == 1) {
+                                launchGAVWorker(info, new HashSet<>(files), new HashMap<>());
+                            }
                             break;
                     }
                     return true;
@@ -946,6 +956,32 @@ public class MainController implements API {
         private void launchGAVWorker(TransferHandler.TransferSupport info, Set<File> files, Map<File, String> sha1Map) {
             SwingWorker<Void, Void> worker = new GAVWorker(MainController.this, info.getComponent(), files, sha1Map);
             worker.execute();
+        }
+
+        private int showTwoFilesDropChoiceDialog(TransferHandler.TransferSupport info) {
+            Component parent = info.getComponent();
+            Object[] options = { "Open 2 files", "Compare 2 files" };
+            return JOptionPane.showOptionDialog(parent,
+                    "You dropped 2 files. What would you like to do?",
+                    "2 files dropped",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[1]);
+        }
+
+        private int showThreeOrMoreFilesDropChoiceDialog(TransferHandler.TransferSupport info) {
+            Component parent = info.getComponent();
+            Object[] options = { "Open all files", "Generate a maven/gradle build skeleton" };
+            return JOptionPane.showOptionDialog(parent,
+                    "You dropped 3 or more files. What would you like to do?",
+                    "Multiple files dropped",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[1]);
         }
     }
 
