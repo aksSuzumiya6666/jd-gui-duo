@@ -11,16 +11,7 @@ import org.jd.gui.api.model.TreeNodeData;
 
 import javax.swing.Icon;
 
-public class QuickOutlineListCellBean implements TreeNodeData {
-    private final String label;
-    private final String fragment;
-    private final Icon icon;
-
-    public QuickOutlineListCellBean(String label, String fragment, Icon icon) {
-        this.label = label;
-        this.fragment = fragment;
-        this.icon = icon;
-    }
+public record QuickOutlineListCellBean(String label, String fragment, Icon icon) implements TreeNodeData {
 
     @Override
     public String getLabel() {
@@ -30,10 +21,6 @@ public class QuickOutlineListCellBean implements TreeNodeData {
     @Override
     public String getTip() {
         return label;
-    }
-
-    public String getFragment() {
-        return fragment;
     }
 
     @Override

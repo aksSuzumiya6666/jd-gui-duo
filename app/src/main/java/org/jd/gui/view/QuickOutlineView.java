@@ -116,7 +116,7 @@ public class QuickOutlineView {
         if (lastPathComponent instanceof DefaultMutableTreeNode treeNode) {
             Object userObject = treeNode.getUserObject();
             if (userObject instanceof QuickOutlineListCellBean cellBean) {
-                String fragment = cellBean.getFragment();
+                String fragment = cellBean.fragment();
                 if (fragment != null && !fragment.isEmpty()) {
                     selectedMemberCallback.accept(fragment);
                     quickOutlineDialog.setVisible(false);
