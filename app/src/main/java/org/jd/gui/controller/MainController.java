@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2025 Emmanuel Dupuy and other contributors.
+ * Copyright (c) 2008-2026 Emmanuel Dupuy and other contributors.
  * This project is distributed under the GPLv3 license.
  * This is a Copyleft license that gives the user the right to use,
  * copy and modify the code freely for non-commercial purposes.
@@ -145,6 +145,7 @@ public class MainController implements API {
     private GoToController goToController;
     private OpenTypeController openTypeController;
     private OpenTypeHierarchyController openTypeHierarchyController;
+    private QuickOutlineController quickOutlineController;
     private PreferencesController preferencesController;
     private SecuredPreferencesController securedPreferencesController;
     private SearchInConstantPoolsController searchInConstantPoolsController;
@@ -183,6 +184,7 @@ public class MainController implements API {
                 this::onFindCriteriaChanged,
                 e -> onOpenType(),
                 e -> onOpenTypeHierarchy(),
+                e -> onQuickOutline(),
                 e -> onGoTo(),
                 e -> openURI(history.backward()),
                 e -> openURI(history.forward()),
@@ -231,6 +233,7 @@ public class MainController implements API {
                 containerChangeListeners.add(openTypeController);
                 openTypeHierarchyController = new OpenTypeHierarchyController(MainController.this, executor, mainFrame);
                 containerChangeListeners.add(openTypeHierarchyController);
+                quickOutlineController = new QuickOutlineController(MainController.this, mainFrame);
                 goToController = new GoToController(configuration, mainFrame);
                 searchInConstantPoolsController = new SearchInConstantPoolsController(MainController.this, executor, mainFrame);
                 containerChangeListeners.add(searchInConstantPoolsController);
@@ -451,6 +454,18 @@ public class MainController implements API {
     protected void onOpenTypeHierarchy() {
         if (currentPage instanceof FocusedTypeGettable ftg) {
             openTypeHierarchyController.show(getCollectionOfFutureIndexes(), ftg.getEntry(), ftg.getFocusedTypeName(), this::openURI);
+        }
+    }
+
+    protected void onQuickOutline() {
+        if (quickOutlineController == null) {
+            return;
+        }
+
+        if ((currentPage instanceof FocusedTypeGettable ftg)
+                && (currentPage instanceof UriGettable ugt)
+                && (currentPage instanceof org.jd.gui.api.feature.UriOpenable uo)) {
+            quickOutlineController.show(ftg, ugt, uo, currentPage);
         }
     }
 

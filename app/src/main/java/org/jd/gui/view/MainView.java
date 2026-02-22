@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2025 Emmanuel Dupuy and other contributors.
+ * Copyright (c) 2008-2026 Emmanuel Dupuy and other contributors.
  * This project is distributed under the GPLv3 license.
  * This is a Copyleft license that gives the user the right to use,
  * copy and modify the code freely for non-commercial purposes.
@@ -94,6 +94,7 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
     private final JMenu recentFiles = new JMenu("Recent Files");
     private Action closeAction;
     private Action openTypeAction;
+    private Action quickOutlineAction;
     private Action backwardAction;
     private Action forwardAction;
     @SuppressWarnings("all")
@@ -134,6 +135,7 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
             Runnable findCriteriaChangedCallback,
             ActionListener openTypeActionListener,
             ActionListener openTypeHierarchyActionListener,
+            ActionListener quickOutlineActionListener,
             ActionListener goToActionListener,
             ActionListener backwardActionListener,
             ActionListener forwardActionListener,
@@ -251,6 +253,7 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
             Action findAction = newAction("Find...", false, findActionListener);
             openTypeAction = newAction("Open Type...", newImageIcon("/org/jd/gui/images/open_type.png"), false, openTypeActionListener);
             Action openTypeHierarchyAction = newAction("Open Type Hierarchy...", false, openTypeHierarchyActionListener);
+            quickOutlineAction = newAction("Quick Outline...", false, quickOutlineActionListener);
             Action goToAction = newAction("Go to Line...", false, goToActionListener);
             backwardAction = newAction("Back", newImageIcon("/org/jd/gui/images/backward_nav.png"), false, backwardActionListener);
             forwardAction = newAction("Forward", newImageIcon("/org/jd/gui/images/forward_nav.png"), false, forwardActionListener);
@@ -297,6 +300,8 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
             menuBar.add(menu);
             menu.add(openTypeAction).setAccelerator(KeyStroke.getKeyStroke('T', menuShortcutKeyMask));
             menu.add(openTypeHierarchyAction).setAccelerator(KeyStroke.getKeyStroke('H', menuShortcutKeyMask));
+            menu.addSeparator();
+            menu.add(quickOutlineAction).setAccelerator(KeyStroke.getKeyStroke('O', menuShortcutKeyMask | InputEvent.SHIFT_DOWN_MASK));
             menu.addSeparator();
             menu.add(goToAction).setAccelerator(KeyStroke.getKeyStroke('L', menuShortcutKeyMask));
             menu.addSeparator();
@@ -355,6 +360,7 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
                                 copyAction.setEnabled(false);
                                 selectAllAction.setEnabled(false);
                                 openTypeHierarchyAction.setEnabled(false);
+                                quickOutlineAction.setEnabled(false);
                                 goToAction.setEnabled(false);
                                 // Update find panel
                                 findPanel.setVisible(false);
@@ -375,6 +381,7 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
                                 selectAllAction.setEnabled(page instanceof ContentSelectable);
                                 findAction.setEnabled(page instanceof ContentSearchable);
                                 openTypeHierarchyAction.setEnabled(page instanceof FocusedTypeGettable);
+                                quickOutlineAction.setEnabled(page instanceof FocusedTypeGettable);
                                 goToAction.setEnabled(page instanceof LineNumberNavigable);
                                 // Update find panel
                                 if (findPanel.isVisible()) {
