@@ -490,7 +490,7 @@ public class MainController implements API {
             Desktop desktop = Desktop.getDesktop();
             if (desktop.isSupported(Desktop.Action.BROWSE)) {
                 try {
-                    desktop.browse(URI.create("http://java-decompiler.github.io"));
+                    desktop.browse(URI.create("https://javadecompiler.neocities.org"));
                 } catch (IOException e) {
                     assert ExceptionUtil.printStackTrace(e);
                 }
@@ -503,7 +503,7 @@ public class MainController implements API {
             Desktop desktop = Desktop.getDesktop();
             if (desktop.isSupported(Desktop.Action.BROWSE)) {
                 try {
-                    desktop.browse(URI.create("https://github.com/nbauma109/jd-gui/issues"));
+                    desktop.browse(URI.create("https://github.com/nbauma109/jd-gui-duo/issues"));
                 } catch (IOException e) {
                     assert ExceptionUtil.printStackTrace(e);
                 }
