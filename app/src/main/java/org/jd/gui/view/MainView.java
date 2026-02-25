@@ -258,7 +258,7 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
             backwardAction = newAction("Back", newImageIcon("/org/jd/gui/images/backward_nav.png"), false, backwardActionListener);
             forwardAction = newAction("Forward", newImageIcon("/org/jd/gui/images/forward_nav.png"), false, forwardActionListener);
             Action searchAction = newAction("Search...", newImageIcon("/org/jd/gui/images/search_src.png"), false, searchActionListener);
-            Action jdWebSiteAction = newAction("JD Web site", browser, "Open JD Web site", jdWebSiteActionListener);
+            Action jdWebSiteAction = newAction("JD Web site", newImageIcon("/org/jd/gui/images/github.png"), browser, "Open JD Web site", jdWebSiteActionListener);
             Action jdGuiIssuesActionAction = newAction("JD-GUI issues", browser, "Open JD-GUI issues page", jdGuiIssuesActionListener);
             Action jdCoreIssuesActionAction = newAction("JD-Core issues", browser, "Open JD-Core issues page", jdCoreIssuesActionListener);
             Action preferencesAction = newAction("Preferences...", newImageIcon("/org/jd/gui/images/preferences.png"), true, "Open the preferences panel",
