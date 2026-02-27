@@ -3,32 +3,19 @@ package org.jd.gui.util.parser.jdt;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
-import org.jd.core.v1.service.converter.classfiletojavasyntax.util.ExceptionUtil;
 import org.jd.core.v1.util.StringConstants;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.util.decompiler.ContainerLoader;
 
 import com.heliosdecompiler.transformerapi.common.ClasspathUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class ASTParserFactory {
-
-    private static final Pattern BUILD_JDK_VERSION = Pattern.compile("^(?:1\\.(\\d+)|(\\d+))(?:\\D.*)?$");
-    private static final String DEFAULT_JDK_VERSION = JavaCore.VERSION_25;
 
     private static final ASTParserFactory INSTANCE = new ASTParserFactory(false, false, false);
     private static final ASTParserFactory BINDING_INSTANCE = new ASTParserFactory(true, true, true);
@@ -46,8 +33,6 @@ public final class ASTParserFactory {
     public static ASTParserFactory getInstanceWithBindings() {
         return BINDING_INSTANCE;
     }
-
-    private static final Map<URI, String> jarTojdkVersion = new ConcurrentHashMap<>();
 
     private final boolean resolveBindings;
     private final boolean bindingRecovery;
@@ -67,9 +52,8 @@ public final class ASTParserFactory {
         parser.setResolveBindings(resolveBindings);
         parser.setBindingsRecovery(bindingRecovery);
         parser.setStatementsRecovery(statementRecovery);
-        List<String> jdkClasspath = getJDKClasspath();
-        String[] classpathEntries = ClasspathUtil.createClasspathEntries(jarURI, jdkClasspath);
-        boolean includeRunningVMBootclasspath = jdkClasspath.isEmpty();
+        String[] classpathEntries = ClasspathUtil.createClasspathEntries(jarURI, Collections.emptyList());
+        boolean includeRunningVMBootclasspath = true;
         if (unitName.endsWith(".java")) {
             String[] sourcepathEntries = { jarURI.getPath() };
             String[] encodings = { StandardCharsets.UTF_8.name() };
@@ -82,102 +66,17 @@ public final class ASTParserFactory {
         }
 
         Map<String, String> options = getDefaultOptions();
-        String majorVersion = jarTojdkVersion.computeIfAbsent(jarURI, ASTParserFactory::resolveJDKVersion);
-        options.put(JavaCore.COMPILER_COMPLIANCE, majorVersion);
-        options.put(JavaCore.COMPILER_SOURCE, majorVersion);
         options.put(JavaCore.COMPILER_PB_MAX_PER_UNIT, String.valueOf(Integer.MAX_VALUE));
         options.put(JavaCore.COMPILER_PB_UNNECESSARY_TYPE_CHECK, "warning");
         parser.setCompilerOptions(options);
         return parser;
     }
 
-    public static List<String> getJDKClasspath() {
-        List<String> cpEntries = new ArrayList<>();
-
-        String javaHome = System.getenv("JAVA_HOME");
-        if (javaHome == null || javaHome.isBlank()) {
-            javaHome = System.getProperty("java.home");
-        }
-        if (javaHome == null || javaHome.isBlank()) {
-            return cpEntries;
-        }
-
-        File home = new File(javaHome);
-        if (!home.isDirectory()) {
-            return cpEntries;
-        }
-
-        // Java 9+ : JRT via jrt-fs.jar
-        File jrtFsJar = new File(home, "lib/jrt-fs.jar");
-        if (jrtFsJar.isFile()) {
-            cpEntries.add(jrtFsJar.getAbsolutePath());
-            return cpEntries;
-        }
-
-        // Java 8- : rt.jar (JDK layout vs JRE layout)
-        File rtJar = new File(home, "jre/lib/rt.jar");
-        if (rtJar.isFile()) {
-            cpEntries.add(rtJar.getAbsolutePath());
-            return cpEntries;
-        }
-
-        rtJar = new File(home, "lib/rt.jar");
-        if (rtJar.isFile()) {
-            cpEntries.add(rtJar.getAbsolutePath());
-        }
-
-        return cpEntries;
-    }
-
-
-    private static String resolveJDKVersion(URI jarURI) {
-        File file = new File(jarURI);
-        String majorVersion = DEFAULT_JDK_VERSION;
-        if (file.isFile() && file.getName().endsWith(".jar")) {
-            try (JarFile jarFile = new JarFile(file)) {
-                Manifest manifest = jarFile.getManifest();
-                if (manifest != null) {
-                    Attributes mainAttributes = manifest.getMainAttributes();
-                    if (mainAttributes != null) {
-                        String jdkVersion = mainAttributes.getValue("Build-Jdk");
-                        if (jdkVersion != null) {
-                            majorVersion = resolveJDKVersion(jdkVersion);
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                assert ExceptionUtil.printStackTrace(e);
-            }
-        }
-        return majorVersion;
-    }
-
     private static Map<String, String> getDefaultOptions() {
         Map<String, String> options = JavaCore.getOptions();
         options.put(JavaCore.CORE_ENCODING, StandardCharsets.UTF_8.name());
-        options.put(JavaCore.COMPILER_COMPLIANCE, DEFAULT_JDK_VERSION);
-        options.put(JavaCore.COMPILER_SOURCE, DEFAULT_JDK_VERSION);
+        options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.latestSupportedJavaVersion());
+        options.put(JavaCore.COMPILER_SOURCE, JavaCore.latestSupportedJavaVersion());
         return options;
-    }
-
-    static String resolveJDKVersion(String longVersion) {
-        return Optional.ofNullable(longVersion)
-                .map(String::trim)
-                .filter(v -> !v.isEmpty())
-                .map(ASTParserFactory::resolveWithSingleRegex)
-                .orElse(DEFAULT_JDK_VERSION);
-    }
-
-    private static String resolveWithSingleRegex(String buildJdk) {
-        Matcher matcher = BUILD_JDK_VERSION.matcher(buildJdk);
-        if (!matcher.matches()) {
-            return DEFAULT_JDK_VERSION;
-        }
-
-        Optional<String> legacyMinor = Optional.ofNullable(matcher.group(1));
-        if (legacyMinor.isPresent()) {
-            return "1." + legacyMinor.get();
-        }
-        return matcher.group(2);
     }
 }
