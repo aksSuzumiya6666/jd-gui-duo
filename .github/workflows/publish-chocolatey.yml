@@ -81,12 +81,12 @@ jobs:
 
           $zipName = "jd-gui-duo-windows-${{ steps.release.outputs.version }}.zip"
           $zipPath = Join-Path $PWD "dist\$zipName"
-          $existingAssetId = gh release view "${{ steps.release.outputs.tag }}" `
+          $existingAssetName = gh release view "${{ steps.release.outputs.tag }}" `
             --repo "${{ github.repository }}" `
             --json assets `
-            --jq ".assets[] | select(.name == `"$zipName`") | .id"
+            --jq ".assets[] | select(.name == `"$zipName`") | .name"
 
-          if ([string]::IsNullOrWhiteSpace($existingAssetId)) {
+          if ([string]::IsNullOrWhiteSpace($existingAssetName)) {
             $archive = Get-ChildItem dist -Filter *.tar.xz | Select-Object -First 1
             if ($null -eq $archive) {
               throw "No Windows archive matching *windows*.tar.xz was found."
@@ -121,13 +121,13 @@ jobs:
           Compress-Archive -Path (Join-Path $tempDir '*') -DestinationPath $zipPath -Force
           Remove-Item -Path $tempDir -Recurse -Force
 
-          if (-not [string]::IsNullOrWhiteSpace($existingAssetId)) {
-            gh api `
-              --method DELETE `
-              "/repos/${{ github.repository }}/releases/assets/$existingAssetId"
+          if (-not [string]::IsNullOrWhiteSpace($existingAssetName)) {
+            gh release delete-asset "${{ steps.release.outputs.tag }}" "$zipName" `
+              --repo "${{ github.repository }}" `
+              --yes
 
             if ($LASTEXITCODE -ne 0) {
-              throw "Failed to delete existing release asset $zipName."
+              throw "Failed to delete existing release asset $zipName. If this repository has release immutability enabled, published assets cannot be replaced."
             }
           }
 
