@@ -78,6 +78,8 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+
           $zipName = "jd-gui-duo-windows-${{ steps.release.outputs.version }}.zip"
           $zipPath = Join-Path $PWD "dist\$zipName"
           $existingAsset = gh release view "${{ steps.release.outputs.tag }}" `
@@ -94,7 +96,33 @@ jobs:
             .\packaging\windows\build-portable-zip.ps1 `
               -InputArchive $archive.FullName `
               -OutputZip $zipPath
+          } else {
+            gh release download "${{ steps.release.outputs.tag }}" `
+              --repo "${{ github.repository }}" `
+              --pattern $zipName `
+              --dir dist
+          }
 
+          $tempDir = Join-Path $PWD "dist\portable-zip"
+          if (Test-Path $tempDir) {
+            Remove-Item -Path $tempDir -Recurse -Force
+          }
+
+          Expand-Archive -Path $zipPath -DestinationPath $tempDir -Force
+
+          $simEngineFiles = Get-ChildItem -Path $tempDir -Recurse -File -Filter simengine.exe
+          foreach ($file in $simEngineFiles) {
+            Remove-Item -Path $file.FullName -Force
+          }
+
+          if (Test-Path $zipPath) {
+            Remove-Item -Path $zipPath -Force
+          }
+
+          Compress-Archive -Path (Join-Path $tempDir '*') -DestinationPath $zipPath -Force
+          Remove-Item -Path $tempDir -Recurse -Force
+
+          if ([string]::IsNullOrWhiteSpace($existingAsset)) {
             for ($attempt = 1; $attempt -le 6; $attempt++) {
               gh release upload "${{ steps.release.outputs.tag }}" $zipPath --repo "${{ github.repository }}"
               if ($LASTEXITCODE -eq 0) {
@@ -107,11 +135,6 @@ jobs:
 
               Start-Sleep -Seconds (5 * $attempt)
             }
-          } else {
-            gh release download "${{ steps.release.outputs.tag }}" `
-              --repo "${{ github.repository }}" `
-              --pattern $zipName `
-              --dir dist
           }
 
           $hash = (Get-FileHash -Algorithm SHA256 $zipPath).Hash.ToUpperInvariant()
@@ -188,34 +211,6 @@ jobs:
             Set-Content -Path (Join-Path $toolsDir "chocolateyuninstall.ps1")
 
           choco pack (Join-Path $packageRoot "${env:PACKAGE_ID}.nuspec") --outputdirectory out
-
-      - name: Remove simengine.exe from Chocolatey package
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-
-          $package = Get-ChildItem out -Filter *.nupkg |
-            Where-Object { $_.Name -notlike "*.symbols.nupkg" } |
-            Select-Object -First 1
-
-          if ($null -eq $package) {
-            throw "No Chocolatey package was generated."
-          }
-
-          $extractDir = Join-Path $PWD "out\nupkg-expanded"
-          if (Test-Path $extractDir) {
-            Remove-Item -Path $extractDir -Recurse -Force
-          }
-
-          Expand-Archive -Path $package.FullName -DestinationPath $extractDir -Force
-
-          $simengineFiles = Get-ChildItem -Path $extractDir -Recurse -File -Filter simengine.exe
-          foreach ($file in $simengineFiles) {
-            Remove-Item -Path $file.FullName -Force
-          }
-
-          Remove-Item -Path $package.FullName -Force
-          Compress-Archive -Path (Join-Path $extractDir '*') -DestinationPath $package.FullName -Force
 
       - name: Push Chocolatey package
         shell: pwsh
