@@ -46,21 +46,39 @@ h2 {
 }
 
 .github-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #000000;
-    color: #ffffff;
-    padding: 10px 16px;
-    border-radius: 6px;
+    display: block;
+    width: 200px;
+    height: 56px;
+    background-image: url("https://raw.githubusercontent.com/nbauma109/jd-gui-duo/refs/heads/master/assets/badges/github-view.svg");
+    background-repeat: no-repeat;
+    background-size: 200px 56px;
+    background-position: 0 0;
     text-decoration: none;
-    font-weight: bold;
-    transition: background 0.2s ease;
+    text-indent: -9999px;
+    overflow: hidden;
+    white-space: nowrap;
+    line-height: 0;
 }
 
-.github-button svg {
-    width: 38px;
-    height: 38px;
+.home-button {
+    display: inline-block;
+    min-width: 180px;
+    padding: 12px 24px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    text-decoration: none;
+    font-weight: 600;
+    line-height: 1.2;
+    box-sizing: border-box;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.home-button:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.55);
+    transform: translateY(-1px);
 }
 
 .download-buttons {

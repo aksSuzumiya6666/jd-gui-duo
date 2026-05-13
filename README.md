@@ -45,7 +45,7 @@ This project is built on top of original [JD-GUI](https://github.com/java-decomp
 
 The binaries are built and hosted at [jitpack.io](https://jitpack.io/p/nbauma109/jd-gui-duo) (identifiable with rocket logo) and the download buttons below retrieve the distributions directly from Jitpack servers :
 
-<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.109/jd-gui-duo-2.0.109-windows.tar.xz?" target="_blank">
+<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.111/jd-gui-duo-2.0.111-windows.tar.xz?" target="_blank">
   <img
     src="assets/badges/jitpack-download-windows.svg"
     width="200"
@@ -53,7 +53,7 @@ The binaries are built and hosted at [jitpack.io](https://jitpack.io/p/nbauma109
     alt="Download Windows archive">
 </a>
 <br>
-<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.109/jd-gui-duo-2.0.109-linux.tar.xz?" target="_blank">
+<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.111/jd-gui-duo-2.0.111-linux.tar.xz?" target="_blank">
   <img
     src="assets/badges/jitpack-download-linux.svg"
     width="200"
@@ -61,7 +61,7 @@ The binaries are built and hosted at [jitpack.io](https://jitpack.io/p/nbauma109
     alt="Download Linux archive">
 </a>
 <br>
-<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.109/jd-gui-duo-2.0.109-macos.tar.xz?" target="_blank">
+<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.111/jd-gui-duo-2.0.111-macos.tar.xz?" target="_blank">
   <img
     src="assets/badges/jitpack-download-macos.svg"
     width="200"
@@ -71,11 +71,29 @@ The binaries are built and hosted at [jitpack.io](https://jitpack.io/p/nbauma109
 
 # Feature tour
 
+## Supported formats
+
+  * `APK`
+  * `DEX`
+  * `AAR`
+  * `CLASS`
+  * `EAR`
+  * `JAR`
+  * `JAVA`
+  * `JMOD`
+  * `KAR`
+  * `WAR`
+  * `ZIP`
+
 ## Open Type
 
-After opening a jar file, click 'Open Type' to decompile a class (tip: use $ to match the end of the class name)
+After opening a jar, APK or similar archive, click 'Open Type' to decompile a class (tip: use $ to match the end of the class name)
 
 ![image](https://javadecompiler.org/jd-gui-duo/open-type.png)
+
+## Open Type Hierarchy
+
+Open Type Hierarchy builds a supertype and subtype tree from the indexes of the currently opened containers. It is useful when a class is spread across several archives or when you want to inspect inheritance without leaving the decompiled view, and if several matching locations exist the location picker lets you choose the target container before opening it.
 
 # Outline tree
 
@@ -116,6 +134,8 @@ Use the search button to do a search for methods, string constants,...
 
 ![image](https://javadecompiler.org/jd-gui-duo/search.png)
 
+The search dialog is index-based and can do more than a plain text lookup. It can search for type, constructor, method, field, string constant and Java module declarations or references, supports `*` and `?` wildcards, and reopens matching entries with highlight information so the relevant occurrences stay marked in the target source view.
+
 ## Decompile all classes
 
 Use File -> Save All Sources to decompile all sources into a sources jar (choose a destination directory where you have rights)
@@ -131,6 +151,10 @@ Use File -> Save All Sources to decompile all sources into a sources jar (choose
  - CTRL+L Goto line
 
 ![image](https://javadecompiler.org/jd-gui-duo/goto-line.png)
+
+## Key bindings
+
+The Help menu also exposes a dedicated Key Bindings dialog. It lets you remap shortcuts for file actions, navigation, search, outline, line navigation and other commands, restore the defaults when needed, and apply the new bindings across the main window and the incremental find UI without editing configuration files by hand.
 
 ## Show byte code
 
@@ -181,9 +205,25 @@ If you select no, you will be asked select which file you want to open
 
 ![image](https://javadecompiler.org/jd-gui-duo/select-location.png)
 
+## Compare JD-Core V0 vs V1
+
+Besides file-level comparison, the File menu can compare JD-Core V0 and JD-Core V1 for the currently opened class. This opens a side-by-side diff for the two built-in engines, which is useful when investigating decompilation regressions, understanding algorithmic differences between both cores or checking why method patching was necessary.
+
+## Build skeleton generation
+
+When you drag and drop three or more libraries, JD-GUI-DUO can generate a Maven/Gradle build skeleton instead of only opening them. The generator resolves SHA-1 values against Maven Central when possible, falls back to filenames and manifest metadata when it cannot, and opens a generated archive containing `pom.xml`, `build.gradle` and `mvn_deploy.bat`.
+
 ## Hyperlinks
 
 The navigable links are shown as underlined portions of text. Single click navigates to definition (no CTRL click, no double click).
+
+## Copy qualified and internal names
+
+The contextual actions also let you copy either the qualified Java name or the JVM internal name of the current type, field or method. This is useful when moving between decompiled source, stack traces, bytecode tools and APIs that expect slash-separated internal names.
+
+## Paste log
+
+Edit -> Paste Log turns the clipboard contents into an in-memory `.log` page. Java stack trace frames are parsed into hyperlinks, so clicking a frame can open the matching decompiled type directly or jump to the reported line number when that information is available in the log.
 
 ## Select Decompiler
 
@@ -256,6 +296,13 @@ It now includes "filter as you type" feature.
 
 ![image](https://javadecompiler.org/jd-gui-duo/quick-outline-old.png)
 
+## Session restore
+
+When JD-GUI-DUO starts without explicit input files, it can reopen the files remembered from the previous session.
+
+## Single instance
+
+On non-macOS platforms, there is also a single-instance preference for the main window. When enabled, opening files in a second launch forwards them to the already running window instead of creating another application instance.
 
 # Credits
 
@@ -267,3 +314,12 @@ Fernflower|Jetbrains|https://github.com/JetBrains/intellij-community/tree/master
 Vineflower|Vineflower|https://github.com/Vineflower/vineflower|Apache v2
 JADX|Skylot|https://github.com/skylot/jadx|Apache v2
 JD-GUI|Emmanuel Dupuy|https://github.com/java-decompiler/jd-gui|GPL v3
+
+## Sponsors
+
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/SignPath/docs-product/main/docs/assets/signpath-logo.svg" alt="SignPath logo" width="200"></td>
+    <td>Free code signing on Windows provided by <a href="https://signpath.io/">SignPath.io</a>, certificate by <a href="https://signpath.org/">SignPath Foundation</a></td>
+  </tr>
+</table>

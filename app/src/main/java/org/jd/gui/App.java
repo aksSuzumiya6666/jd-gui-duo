@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * © 2008-2019 Emmanuel Dupuy
+ * © 2021-2026 Nicolas Baumann (@nbauma109)
  * This project is distributed under the GPLv3 license.
  * This is a Copyleft license that gives the user the right to use,
  * copy and modify the code freely for non-commercial purposes.
@@ -13,6 +14,7 @@ import org.jd.gui.controller.MainController;
 import org.jd.gui.model.configuration.Configuration;
 import org.jd.gui.service.configuration.ConfigurationPersister;
 import org.jd.gui.service.configuration.ConfigurationPersisterService;
+import org.jd.gui.util.ThemeUtil;
 import org.jd.gui.util.net.InterProcessCommunicationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +85,7 @@ public class App {
                     assert ExceptionUtil.printStackTrace(ee);
                 }
            }
+            ThemeUtil.applyMenuItemPaddingFix();
 
             // Create main controller and show main frame
             controller = new MainController(configuration);

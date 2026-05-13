@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2008-2026 Emmanuel Dupuy and other contributors.
+ * © 2008-2026 Emmanuel Dupuy
+ * © 2021-2026 Nicolas Baumann (@nbauma109)
  * This project is distributed under the GPLv3 license.
  * This is a Copyleft license that gives the user the right to use,
  * copy and modify the code freely for non-commercial purposes.
@@ -85,6 +86,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -179,7 +182,7 @@ public class MainController implements API {
                 e -> onClose(),
                 e -> onSaveSource(),
                 e -> onSaveAllSources(),
-                e -> System.exit(0),
+                e -> onExit(),
                 e -> onCopy(),
                 e -> onPaste(),
                 e -> onSelectAll(),
@@ -217,6 +220,12 @@ public class MainController implements API {
         SwingUtil.invokeLater(() -> {
             // Show main frame
             mainView.show(configuration.getMainWindowLocation(), configuration.getMainWindowSize(), configuration.isMainWindowMaximize());
+            mainView.getMainFrame().addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    updateRememberedOpenFiles();
+                }
+            });
             if (!files.isEmpty()) {
                 openFiles(files);
             } else {
@@ -348,6 +357,11 @@ public class MainController implements API {
                 }
         	}
         }
+    }
+
+    protected void onExit() {
+        updateRememberedOpenFiles();
+        System.exit(0);
     }
 
     protected void onClose() {
