@@ -45,7 +45,7 @@ This project is built on top of original [JD-GUI](https://github.com/java-decomp
 
 The binaries are built and hosted at [jitpack.io](https://jitpack.io/p/nbauma109/jd-gui-duo) (identifiable with rocket logo) and the download buttons below retrieve the distributions directly from Jitpack servers :
 
-<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.111/jd-gui-duo-2.0.111-windows.tar.xz?" target="_blank">
+<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.112/jd-gui-duo-2.0.112-windows.tar.xz?" target="_blank">
   <img
     src="assets/badges/jitpack-download-windows.svg"
     width="200"
@@ -53,7 +53,7 @@ The binaries are built and hosted at [jitpack.io](https://jitpack.io/p/nbauma109
     alt="Download Windows archive">
 </a>
 <br>
-<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.111/jd-gui-duo-2.0.111-linux.tar.xz?" target="_blank">
+<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.112/jd-gui-duo-2.0.112-linux.tar.xz?" target="_blank">
   <img
     src="assets/badges/jitpack-download-linux.svg"
     width="200"
@@ -61,13 +61,21 @@ The binaries are built and hosted at [jitpack.io](https://jitpack.io/p/nbauma109
     alt="Download Linux archive">
 </a>
 <br>
-<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.111/jd-gui-duo-2.0.111-macos.tar.xz?" target="_blank">
+<a href="https://jitpack.io/com/github/nbauma109/jd-gui-duo/jd-gui-duo/2.0.112/jd-gui-duo-2.0.112-macos.tar.xz?" target="_blank">
   <img
     src="assets/badges/jitpack-download-macos.svg"
     width="200"
     height="56"
     alt="Download macOS archive">
 </a>
+
+Windows users can also install with WinGet:
+
+```powershell
+winget install --id Nbauma109.JDGUIDuo
+```
+
+This installs the latest stable release from the default WinGet source.
 
 # Feature tour
 
@@ -323,3 +331,9 @@ JD-GUI|Emmanuel Dupuy|https://github.com/java-decompiler/jd-gui|GPL v3
     <td>Free code signing on Windows provided by <a href="https://signpath.io/">SignPath.io</a>, certificate by <a href="https://signpath.org/">SignPath Foundation</a></td>
   </tr>
 </table>
+
+## Star history
+
+This project is community-funded. If you find it useful, please consider donating via [Liberapay](https://liberapay.com/nbauma109/) (from €1) or giving it a star.
+
+[![Star History Chart](https://api.star-history.com/chart?repos=nbauma109/jd-gui-duo&type=date&logscale=true&legend=top-left)](https://www.star-history.com/?repos=nbauma109%2Fjd-gui-duo&type=date&logscale=true&legend=top-left)

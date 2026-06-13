@@ -1,0 +1,91 @@
+name: "Crosspost Release to Social Media"
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to crosspost (for dispatches from release workflow)
+        required: true
+        type: string
+
+env:
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.event.release.tag_name }}
+
+jobs:
+  validate:
+    name: "Validate release exists"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Verify release tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+        run: gh release view "$RELEASE_TAG" --repo "${{ github.repository }}"
+
+  crosspost:
+    name: "Crosspost to Social Media"
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Crosspost to Bluesky and Mastodon
+        uses: tgagor/action-crosspost@73c5543b6b0013eb5e3ccbe5401fd17e0ad79171 # v1.6.4
+        env:
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+        with:
+          feed-url: https://github.com/${{ github.repository }}/releases.atom
+          limit: 1
+          since: 15
+          filter-urls: |
+            /releases/tag/${{ env.RELEASE_TAG }}
+          message: |
+            🎉 New release of JD-GUI Duo ${{ env.RELEASE_TAG }} is out!
+            {url}
+            #Java #JavaDecompiler #OpenSource #ReverseEngineering
+          bluesky-host: bsky.social
+          bluesky-identifier: ${{ secrets.BLUESKY_IDENTIFIER }}
+          bluesky-password: ${{ secrets.BLUESKY_PASSWORD }}
+          mastodon-access-token: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+          mastodon-host: ${{ secrets.MASTODON_HOST }}
+
+  devto:
+    name: "Publish to Dev.to"
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Create release post
+        env:
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          OPENGRAPH_CACHE_KEY="$(openssl rand -hex 32)"
+          POST_FILE="posts/release-${RELEASE_TAG}.md"
+          mkdir -p "$(dirname "$POST_FILE")"
+          if [ ! -f "$POST_FILE" ]; then
+            cat > "$POST_FILE" << EOF
+          ---
+          title: "🎉 New release of JD-GUI Duo ${RELEASE_TAG} is out!"
+          published: true
+          description: "New release of JD-GUI Duo"
+          tags: java, decompiler, opensource, reverseengineering
+          ---
+
+          [![JD-GUI Duo release ${RELEASE_TAG}](https://opengraph.githubassets.com/${OPENGRAPH_CACHE_KEY}/${REPOSITORY}/releases/tag/${RELEASE_TAG})](https://github.com/${REPOSITORY}/releases/tag/${RELEASE_TAG})
+          EOF
+          fi
+      - name: Publish to Dev.to
+        uses: sinedied/publish-devto@c713cc0934b35cb3df9fca759b98e36e6a540a85 # v2
+        with:
+          devto_key: ${{ secrets.DEVTO_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: 'posts/release-${{ env.RELEASE_TAG }}.md'
+          branch: master
+          conventional_commits: false
