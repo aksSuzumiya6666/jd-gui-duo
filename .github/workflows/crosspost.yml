@@ -34,7 +34,7 @@ jobs:
       contents: read
     steps:
       - name: Crosspost to Bluesky and Mastodon
-        uses: tgagor/action-crosspost@73c5543b6b0013eb5e3ccbe5401fd17e0ad79171 # v1.6.4
+        uses: tgagor/action-crosspost@e77c2d8265863cfebb60bcdc325779df0daeaac4 # v1.6.6
         env:
           RELEASE_TAG: ${{ env.RELEASE_TAG }}
         with:
