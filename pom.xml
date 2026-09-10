@@ -140,12 +140,12 @@
       <dependency>
         <groupId>org.eclipse.jdt</groupId>
         <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
-        <version>1.24.100</version>
+        <version>1.25.0</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jdt</groupId>
         <artifactId>org.eclipse.jdt.core</artifactId>
-        <version>3.46.0</version>
+        <version>3.47.0</version>
       </dependency>
       <dependency>
         <groupId>com.github.freva</groupId>
@@ -155,7 +155,7 @@
       <dependency>
         <groupId>net.sourceforge.plantuml</groupId>
         <artifactId>plantuml-mit-light</artifactId>
-        <version>1.2026.6</version>
+        <version>1.2026.8</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
